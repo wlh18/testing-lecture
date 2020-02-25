@@ -57,42 +57,34 @@ Let's write our first unit test:
 
 1. Create a `__tests__` folder and a `functions.js` file in the src folder.
    > The functions file is for showing off jest functionality. These functions can come from anywhere
-2. Create the following functions in the `functions.js` file.
+2. Create a `functions.test.js` file in the `__tests__` folder. This file will be used to test our functions in `functions.js`.
+3. Let's look at what goes into writing a unit test using Jest:
 
 ```js
-module.exports = {
-  sum(a, b) {
-    return a + b
-  },
-  sayHello() {
-    return 'hello'
-  },
-}
+const { sum, sayHello } = require('../functions')
+//Import our functions to be tested
+
+//We set up a unit test using the following syntax:
+test('adds 1 + 2 to equal 3', () => {
+  //The test function is provided to us by Jest and is available globally
+  //We provide it with two arguments: a description of our test and a callback function.  This callback function is our test.
+
+  expect(sum(1, 2)).toBe(3)
+  //In this case we are testing if our sum function is able to add 1 and 2 together.
+  //We use the expect keyword to expect a certain value and the toBe matcher to determine what we expect the value to be.
+  //In this case, we expect the invocation of sum with 1 and 2 passed as arguments to be 3.
+})
 ```
 
-3. Create a `functions.test.js` file in the `__tests__` folder. Add the following code:
+Run `npm run test` to run our tests. You will see in the console whether your tests pass or not. Let's write another test in the same file:
 
 ```js
-//Import our functions to test
-const { sum, sayHello } = require('../functions.js')
-
-// Basic test example
-test('adds 1 + 2 to equal 3', () => {
-  expect(sum(1, 2)).toBe(3)
-  //To be is for simple values
-})
-
-// expect gives us access to certain methods to validate return values
 test('sayHello says hello', () => {
   expect(sayHello()).toBe('hello')
 })
 ```
 
-> Test is given to us by Jest, it sets up a test block and takes two arguments: a description of the test and a callback function where our assertions will run.
->
-> Expect will invoke whatever we pass it and pass the return value to the next function. We can assert things about the returned values which will cause our test to pass or fail. This is done through matchers.
-
-Test the following to show matchers:
+Let's look at some other matchers available to us through Jest. Include the following tests in our `functions.test.js` file:
 
 ```js
 // Checking the value of an object
@@ -116,12 +108,13 @@ test('Names contains Ariel', () => {
 })
 ```
 
-> You should also add a couple of more tests to existing blocks to show off the `not` matcher.
+One of the most important matchers in Jest is the `not` matcher. This allows you to flip any matcher. Let's look at some examples:
 
 ```js
 test('Add 1 and 2 to equal 3', () => {
   expect(sum(1, 2)).toBe(3)
   expect(sum(1, 2)).not.toBeNaN()
+  //You can append not before any matcher to flip what it checks for
 })
 
 test('Names contains Becca', () => {
@@ -130,11 +123,9 @@ test('Names contains Becca', () => {
 })
 ```
 
-> [Show off other matchers](https://jestjs.io/docs/en/expect)
+There are a ton of matchers available in Jest you can see them [here](https://jestjs.io/docs/en/expect)
 
-> There is a better way to group tests together, a `describe` block. This functions like a test block but holds related tests.
-
-Show setup and teardown of tests:
+Above you will see that we grouped two tests together. This is not the correct way to do things because each test should exist in isolation. Each test should not be dependent on any other test passing or failing. If we need to group tests together, there is a better way to do it, a `describe` block. This functions like a test block but holds related tests. Even though they are grouped together, they exist independently of each other.
 
 ```js
 let bankAccount = {
