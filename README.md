@@ -2,12 +2,14 @@
 
 ## Learning objectives
 
-[Lecture Repo](https://github.com/andrewwestenskow/unit-testing-lecture) <br>
+Fork and clone this repo to follow along with the lecture. <br>
 
 > Checkout to branch `completed` for finished version.<br>
 
 [Mini project](https://github.com/DevMountain/unit-testing-mini-new) <br>
 [Afternoon Project](https://github.com/DevMountain/unit-testing-afternoon-new)
+
+## Learning Objectives
 
 - Students can perform unit tests using Jest.
   - Become familiar with the common matchers [Link](https://jestjs.io/docs/en/expect)
@@ -22,21 +24,36 @@
 
 ## Lecture
 
-- Why are we teaching testing?
-  - Group project requirements (5 unit tests and 5 mocked components)
-  - TDD (Test driven development) [Image](https://miro.medium.com/max/996/1*pP8Ks6tlt718jJg3fqrtvw.jpeg)
-  - There is a need for developers who know how to test
-    - Podium is a big local company that does entirely test driven development
-  - Benefits of unit testing
-    - You know what you expect to happen from the start (Debugging in an isolated environment)
-    - Documentation for your project
-    - Allows you to find holes in your logic you might not have otherwise found
+### Testing: What and Why?
 
-### Jest [Link](https://jestjs.io/)
+Testing refers to the process of writing tests for our code based on what we expect to happen and then running our code against those tests. Our code will be considered successful if it passes the tests that we write for it. The idea is that we determine from the start what we expect a function or a component to do, write tests to reflect these expectations, and then put our components up against these tests. If they behave the way we expect, then we can move on. Otherwise, we need to refactor our code to pass the tests. There are several common kinds of testing in the development world:
 
-- Jest is a unit testing library. It allows us to test functions, also known as performing unit tests.
+- Unit Testing: Used to test a single function.
+- Endpoint Testing: Used to test an endpoint. Postman tests would be an example of this.
+- Component Testing/Mocking Components: Testing a component in a simulated environment
+- End to End Testing: Simulates a user interacting with the website.
+
+Traditionally, testing is handled by QA engineers but there is a trend emerging of test driven development:
+
+![Test driven development](https://miro.medium.com/max/700/1*tZSwCigaTaJdovyWlp5uBQ.jpeg)
+
+There is a huge need for developers who know how to test their code and the more familiar you become with it, the more valuable you will be to a future employer. There are many companies that are now shifting to an entirely test driven development cycle.
+
+Benefits of testing:
+
+- You know exactly what you expect to happen right from the start. This reduces debugging time as it allows you to develop in a more isolated environment
+- It created automatic documentation for your project
+- Allows you to think through your logic beforehand and find any holes you may not have intended.
+
+### Jest
+
+- Jest is a unit testing library which allows us to perform unit tests.
+  - The docs will be helpful for understanding its capabilities [link](https://jestjs.io/)
+  - We will just be scratching the surface on Jest but it will be worth your time to read through the docs.
 - Jest comes out of the box with create-react-app.
-  - With cra, all of our tests need to be located in the src folder, these will not be compiled on build.
+  - When bootstrapping a project with create-react-app, all of our tests must be included in the src directory and will not be compiled on build.
+
+Let's write our first unit test:
 
 1. Create a `__tests__` folder and a `functions.js` file in the src folder.
    > The functions file is for showing off jest functionality. These functions can come from anywhere
