@@ -2,7 +2,7 @@
 
 ## Learning objectives
 
-Fork and clone this repo to follow along with the lecture. <br>
+Fork and clone this repo, run `npm i` and `npm run dev` to get everything working. <br>
 
 > Checkout to branch `completed` for finished version.<br>
 
@@ -127,23 +127,21 @@ There are a ton of matchers available in Jest you can see them [here](https://je
 
 Above you will see that we grouped two tests together. This is not the correct way to do things because each test should exist in isolation. Each test should not be dependent on any other test passing or failing. If we need to group tests together, there is a better way to do it, a `describe` block. This functions like a test block but holds related tests. Even though they are grouped together, they exist independently of each other.
 
-```js
-let bankAccount = {
-  balance: 1000,
-  depositMoney(amount) {
-    this.balance += amount
-  },
-  withdrawMoney(amount) {
-    this.balance -= amount
-  },
-}
+Create a new file called `bankAccount.test.js` in your `__tests__` directory. We will be using the object provided in `bankAccount.js` to run multiple tests together.
 
-// Grouping tests together
+```js
+import bankAccount from '../bankAccount'
+
+//The describe block is provided by Jest and allows us to group tests together while allowing them to pass or fail independently of each other.
 describe('Bank account methods and properties', () => {
-  //There is also: beforeAll, afterAll, afterEach
+  //Describe takes a description and a callback function which will contain the tests we want to run.
   beforeEach(() => {
+    //Inside of a describe block, we have access to test setup and teardown.
+    //Here this function will run before each test in our describe block but we can also use: beforeAll, afterAll, afterEach
     bankAccount.balance = 1000
   })
+
+  //Try to walk yourself through what each of the below tests is doing.
   test('Initial balance is 1000', () => {
     expect(bankAccount.balance).toBe(1000)
   })
@@ -158,28 +156,35 @@ describe('Bank account methods and properties', () => {
 })
 ```
 
-## Testing React
+### Testing React
 
-You can also test entire React components, we'll make sure that our components are displaying what we want them to. This is called mocking your components.
+You can also test entire React components, also called mocking components. We will use a couple of simple examples to make sure that our components are displaying what we want them to. To do this we will use Facebook's native React testing library. This is also provided by create-react-app. THis library will allow us to mount our components in a virtual environment and test them.
 
-Use the following code:
+In `Header.js` we don't want our dropdown to be open by default so we'll test if this is the case
+
+Create a file called `Header.test.js` in our `__tests__` directory.
 
 ```js
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
-import Header from '../Header'
+//render and fireEvent are provided to us by the React testing library.  The functionality of these will become clear further down.
+import Header from '../components/Header'
+//We need to import the component that we want to test
 
 it('Does not show dropdown when mounted', () => {
-  //render will render the component onto the dom and allow us to test it.  It will return an object with a number of properties.
+  //Instead of a test block, we will use an it block but this functions very similarly to our test blocks above.  We provide the same arguments.
 
-  //To query by test id we have to give it a test id in this format : data-testid
   const { queryByTestId } = render(<Header />)
-  //Another option is getBy but since we don't know if there will be a value, we should use queryBy
+  //render will render our component onto the dom and allow us to test it.  It will return an object with a number of properties, one of these is a function queryByTestId.  This behaves similarly to the vanillaJs functions querySelector or getElementById
+  //To query an element by test id we have to give it a test id in this format : data-testid.  Check Header.js for this
+
   const dropdown = queryByTestId('dropdown')
 
   expect(dropdown).not.toBeTruthy()
   //We expect the dropdown to not be rendered so it should not be truthy.
 })
+
+//Now let's test that our menu shows when the hamburger is clicked.
 
 it('Shows dropdown when hamburger is clicked', () => {
   const { container, getByTestId } = render(<Header />)
@@ -188,42 +193,48 @@ it('Shows dropdown when hamburger is clicked', () => {
   const hamburger = getByTestId('hamburger-button')
 
   fireEvent.click(hamburger)
+  //This will click on the hamburger
 
   expect(container.textContent).toContain('Dropdown menu')
+  //Because we have clicked on our hamburger, we expect our html element to contain the text Dropdown menu
 })
 ```
 
 ### Async component testing
 
-Often we need to test components that have async logic, ie network calls:
+Often we need to test components that have async logic like network calls. We are able to use a combination of Jest and the React testing library to make this happen.
+
+Create a file called `Todos.test.js` in our `__tests__` directory.
 
 ```js
 import React from 'react'
 import { render, act } from '@testing-library/react'
-//act will assure that all 'units' of interaction inside of your component (like data fetching, user events, rendering) are completed before you run any assertions.
-
-//Because our component is making a request, we need to wrap our initial rendering of Todos in an async version of Todos
+//act is provided by the React testing library will assure that all 'units' of interaction inside of your component (like data fetching, user events, rendering) are completed before you run any assertions.
 import axios from 'axios'
 import Todos from '../Components/Todos'
 
 it('Renders todos', async () => {
+  //Because we need to test async logic, our test function has to be asynchronous.
   let component
   //Initializes a variable for us to test later.
 
   jest
     .spyOn(axios, 'get')
-    //spyOn watches the axios object and tracks any calls to the get method
+    //spyOn is provided by Jest and watches the axios object and tracks any calls to the get method
     .mockImplementation(() =>
-      //mockImplementation intercepts those calls and replaces the functionality with what I say.
+      //mockImplementation intercepts those calls and replaces the functionality with what we give it.
       Promise.resolve({ data: [{ id: 1, title: 'test title' }] })
     )
+  //So what this is saying is that inside of this test, any get request that is made will resolve to be our test post rather than the actual result from our network call.  This gives us more control over our testing environment.
 
   await act(async () => {
+    //By awaiting act we make sure that any network calls resolve before making our assertions
     const { container } = render(<Todos />)
     component = container
     //Grabs the dom container from the Todos component and reassigns it to the component variable
   })
 
   expect(component.textContent).toContain('test title')
+  //This will verify
 })
 ```
