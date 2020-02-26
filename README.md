@@ -2,7 +2,7 @@
 
 ## Learning objectives
 
-Fork and clone this repo to follow along with the lecture. <br>
+Fork and clone this repo, run `npm i` and `npm run dev` to get everything working. <br>
 
 > Checkout to branch `completed` for finished version.<br>
 
@@ -57,42 +57,34 @@ Let's write our first unit test:
 
 1. Create a `__tests__` folder and a `functions.js` file in the src folder.
    > The functions file is for showing off jest functionality. These functions can come from anywhere
-2. Create the following functions in the `functions.js` file.
+2. Create a `functions.test.js` file in the `__tests__` folder. This file will be used to test our functions in `functions.js`.
+3. Let's look at what goes into writing a unit test using Jest:
 
 ```js
-module.exports = {
-  sum(a, b) {
-    return a + b
-  },
-  sayHello() {
-    return 'hello'
-  },
-}
+const { sum, sayHello } = require('../functions')
+//Import our functions to be tested
+
+//We set up a unit test using the following syntax:
+test('adds 1 + 2 to equal 3', () => {
+  //The test function is provided to us by Jest and is available globally
+  //We provide it with two arguments: a description of our test and a callback function.  This callback function is our test.
+
+  expect(sum(1, 2)).toBe(3)
+  //In this case we are testing if our sum function is able to add 1 and 2 together.
+  //We use the expect keyword to expect a certain value and the toBe matcher to determine what we expect the value to be.
+  //In this case, we expect the invocation of sum with 1 and 2 passed as arguments to be 3.
+})
 ```
 
-3. Create a `functions.test.js` file in the `__tests__` folder. Add the following code:
+Run `npm run test` to run our tests. You will see in the console whether your tests pass or not. Let's write another test in the same file:
 
 ```js
-//Import our functions to test
-const { sum, sayHello } = require('../functions.js')
-
-// Basic test example
-test('adds 1 + 2 to equal 3', () => {
-  expect(sum(1, 2)).toBe(3)
-  //To be is for simple values
-})
-
-// expect gives us access to certain methods to validate return values
 test('sayHello says hello', () => {
   expect(sayHello()).toBe('hello')
 })
 ```
 
-> Test is given to us by Jest, it sets up a test block and takes two arguments: a description of the test and a callback function where our assertions will run.
->
-> Expect will invoke whatever we pass it and pass the return value to the next function. We can assert things about the returned values which will cause our test to pass or fail. This is done through matchers.
-
-Test the following to show matchers:
+Let's look at some other matchers available to us through Jest. Include the following tests in our `functions.test.js` file:
 
 ```js
 // Checking the value of an object
@@ -116,12 +108,13 @@ test('Names contains Ariel', () => {
 })
 ```
 
-> You should also add a couple of more tests to existing blocks to show off the `not` matcher.
+One of the most important matchers in Jest is the `not` matcher. This allows you to flip any matcher. Let's look at some examples:
 
 ```js
 test('Add 1 and 2 to equal 3', () => {
   expect(sum(1, 2)).toBe(3)
   expect(sum(1, 2)).not.toBeNaN()
+  //You can append not before any matcher to flip what it checks for
 })
 
 test('Names contains Becca', () => {
@@ -130,29 +123,25 @@ test('Names contains Becca', () => {
 })
 ```
 
-> [Show off other matchers](https://jestjs.io/docs/en/expect)
+There are a ton of matchers available in Jest you can see them [here](https://jestjs.io/docs/en/expect)
 
-> There is a better way to group tests together, a `describe` block. This functions like a test block but holds related tests.
+Above you will see that we grouped two tests together. This is not the correct way to do things because each test should exist in isolation. Each test should not be dependent on any other test passing or failing. If we need to group tests together, there is a better way to do it, a `describe` block. This functions like a test block but holds related tests. Even though they are grouped together, they exist independently of each other.
 
-Show setup and teardown of tests:
+Create a new file called `bankAccount.test.js` in your `__tests__` directory. We will be using the object provided in `bankAccount.js` to run multiple tests together.
 
 ```js
-let bankAccount = {
-  balance: 1000,
-  depositMoney(amount) {
-    this.balance += amount
-  },
-  withdrawMoney(amount) {
-    this.balance -= amount
-  },
-}
+import bankAccount from '../bankAccount'
 
-// Grouping tests together
+//The describe block is provided by Jest and allows us to group tests together while allowing them to pass or fail independently of each other.
 describe('Bank account methods and properties', () => {
-  //There is also: beforeAll, afterAll, afterEach
+  //Describe takes a description and a callback function which will contain the tests we want to run.
   beforeEach(() => {
+    //Inside of a describe block, we have access to test setup and teardown.
+    //Here this function will run before each test in our describe block but we can also use: beforeAll, afterAll, afterEach
     bankAccount.balance = 1000
   })
+
+  //Try to walk yourself through what each of the below tests is doing.
   test('Initial balance is 1000', () => {
     expect(bankAccount.balance).toBe(1000)
   })
@@ -167,28 +156,35 @@ describe('Bank account methods and properties', () => {
 })
 ```
 
-## Testing React
+### Testing React
 
-You can also test entire React components, we'll make sure that our components are displaying what we want them to. This is called mocking your components.
+You can also test entire React components, also called mocking components. We will use a couple of simple examples to make sure that our components are displaying what we want them to. To do this we will use Facebook's native React testing library. This is also provided by create-react-app. THis library will allow us to mount our components in a virtual environment and test them.
 
-Use the following code:
+In `Header.js` we don't want our dropdown to be open by default so we'll test if this is the case
+
+Create a file called `Header.test.js` in our `__tests__` directory.
 
 ```js
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react'
-import Header from '../Header'
+//render and fireEvent are provided to us by the React testing library.  The functionality of these will become clear further down.
+import Header from '../components/Header'
+//We need to import the component that we want to test
 
 it('Does not show dropdown when mounted', () => {
-  //render will render the component onto the dom and allow us to test it.  It will return an object with a number of properties.
+  //Instead of a test block, we will use an it block but this functions very similarly to our test blocks above.  We provide the same arguments.
 
-  //To query by test id we have to give it a test id in this format : data-testid
   const { queryByTestId } = render(<Header />)
-  //Another option is getBy but since we don't know if there will be a value, we should use queryBy
+  //render will render our component onto the dom and allow us to test it.  It will return an object with a number of properties, one of these is a function queryByTestId.  This behaves similarly to the vanillaJs functions querySelector or getElementById
+  //To query an element by test id we have to give it a test id in this format : data-testid.  Check Header.js for this
+
   const dropdown = queryByTestId('dropdown')
 
   expect(dropdown).not.toBeTruthy()
   //We expect the dropdown to not be rendered so it should not be truthy.
 })
+
+//Now let's test that our menu shows when the hamburger is clicked.
 
 it('Shows dropdown when hamburger is clicked', () => {
   const { container, getByTestId } = render(<Header />)
@@ -197,42 +193,48 @@ it('Shows dropdown when hamburger is clicked', () => {
   const hamburger = getByTestId('hamburger-button')
 
   fireEvent.click(hamburger)
+  //This will click on the hamburger
 
   expect(container.textContent).toContain('Dropdown menu')
+  //Because we have clicked on our hamburger, we expect our html element to contain the text Dropdown menu
 })
 ```
 
 ### Async component testing
 
-Often we need to test components that have async logic, ie network calls:
+Often we need to test components that have async logic like network calls. We are able to use a combination of Jest and the React testing library to make this happen.
+
+Create a file called `Todos.test.js` in our `__tests__` directory.
 
 ```js
 import React from 'react'
 import { render, act } from '@testing-library/react'
-//act will assure that all 'units' of interaction inside of your component (like data fetching, user events, rendering) are completed before you run any assertions.
-
-//Because our component is making a request, we need to wrap our initial rendering of Todos in an async version of Todos
+//act is provided by the React testing library will assure that all 'units' of interaction inside of your component (like data fetching, user events, rendering) are completed before you run any assertions.
 import axios from 'axios'
 import Todos from '../Components/Todos'
 
 it('Renders todos', async () => {
+  //Because we need to test async logic, our test function has to be asynchronous.
   let component
   //Initializes a variable for us to test later.
 
   jest
     .spyOn(axios, 'get')
-    //spyOn watches the axios object and tracks any calls to the get method
+    //spyOn is provided by Jest and watches the axios object and tracks any calls to the get method
     .mockImplementation(() =>
-      //mockImplementation intercepts those calls and replaces the functionality with what I say.
+      //mockImplementation intercepts those calls and replaces the functionality with what we give it.
       Promise.resolve({ data: [{ id: 1, title: 'test title' }] })
     )
+  //So what this is saying is that inside of this test, any get request that is made will resolve to be our test post rather than the actual result from our network call.  This gives us more control over our testing environment.
 
   await act(async () => {
+    //By awaiting act we make sure that any network calls resolve before making our assertions
     const { container } = render(<Todos />)
     component = container
     //Grabs the dom container from the Todos component and reassigns it to the component variable
   })
 
   expect(component.textContent).toContain('test title')
+  //This will verify
 })
 ```
