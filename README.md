@@ -238,3 +238,14 @@ it('Renders todos', async () => {
   //This will verify
 })
 ```
+
+
+## Additional Resources
+  - [Jest has several guides and examples here in its official docs.](https://jestjs.io/docs/en/getting-started)
+  - [A video tutorial of jest basics that covers the content of this lecture.](https://www.youtube.com/watch?v=7r4xVDI2vho)
+  - [An in-depth tutorial and discussion of using jest in a React app.](https://www.sitepoint.com/test-react-components-jest/)
+  - [A discussion of why jest and the react-testing-library are effective.](https://itnext.io/testing-components-with-jest-and-react-testing-library-d36f5262cde2)
+  - [A cheat sheet for jest syntax.](https://devhints.io/jest)
+  - [The list of matchers referenced in the Student Learning Objectives section.](https://jestjs.io/docs/en/expect)
+  - [React Testing Library official docs.](https://testing-library.com/docs/react-testing-library/intro)
+  - [Walk-through explanation for writing a component test.](https://blog.bitsrc.io/testing-react-applications-with-react-testing-library-da66aaef740a)
