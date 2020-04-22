@@ -22,9 +22,10 @@ export default class Header extends Component {
           onClick={this.flipDropdown}
           data-testid="hamburger-button"
         />
+        This is also some text content
         {this.state.showDropdown ? (
           <div className="dropdown" data-testid="dropdown">
-            Dropdown menu
+            Dropdown menu also this is the text content
           </div>
         ) : null}
       </div>
